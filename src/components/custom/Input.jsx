@@ -1,25 +1,63 @@
-/* eslint-disable react/prop-types */
+import { useState } from "react";
+import { FaEyeSlash, FaEye } from "react-icons/fa";
 
-import { Eye, EyeOff } from "lucide-react"
-import { useState } from "react"
-
-
-function Input(props) {
-    const { label, type, children, ...otherInputsProps } = props
-    const [showPassword, isShowPassword] = useState(false)
-
-    return (
-        <article className="flex flex-col gap-2">
-            <label className="text-white">{label}</label>
-            {children ? children : <article className="w-full bg-white rounded-md flex items-center p-1 px-3">
-                <input type={type == "password" ? showPassword ? "text" : type : type} placeholder={label} className=" p-2 w-full outline-none text-black flex-1" {...otherInputsProps} />
-                {type == 'password' && <span className="cursor-pointer" onClick={() => isShowPassword(!showPassword)}>
-                    {showPassword ? <EyeOff size={20} className="text-gray-500" /> :
-                        <Eye size={20} className="text-gray-500" />}
-                </span>}
-            </article>}
-        </article>
-    )
+export default function Input({
+  type,
+  value,
+  onChange,
+  className,
+  disable,
+  label,
+  placeholder,
+  parentWidth,
+}) {
+  const [showPassword, setShowPassword] = useState(false);
+  const theme = {
+    account:
+      "w-full bg-white p-3 outline-none rounded-md text-black transition duration-300 ease-in-out block focus:shadow-[0_0_0_2px_#fbbf24]",
+    labelDefault: "text-sm block mb-2 text-black",
+  };
+  return (
+    <div className={`flex flex-col gap-1 ${parentWidth ? parentWidth : ""}`}>
+      {label ? (
+        <label
+          className={
+            typeof label?.styles === "boolean"
+              ? theme.labelDefault
+              : label?.styles
+          }
+        >
+          {label?.text}
+        </label>
+      ) : (
+        ""
+      )}
+      <div
+        className={`${
+          type === "password"
+            ? "flex flex-row justify-between items-center relative"
+            : ``
+        }`}
+      >
+        <input
+          className={typeof className === "boolean" ? theme.account : className}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          disabled={disable}
+          type={type === "password" ? (showPassword ? "text" : type) : type}
+          placeholder={placeholder}
+        />
+        {type === "password" && (
+          <span
+            className="text-gray-500 cursor-pointer absolute right-2  bg-white"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+          </span>
+        )}
+      </div>
+    </div>
+  );
 }
 
-export default Input
+// transition duration-300 ease-in-out shadow-[0_0_0_2px] shadow-amber-300"

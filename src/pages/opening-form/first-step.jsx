@@ -1,3 +1,5 @@
+import { Input } from "@/components/custom";
+
 export default function FirstStep({ bio, handleInputChange }) {
   return (
     <div className="flex flex-col items-start">
@@ -5,19 +7,20 @@ export default function FirstStep({ bio, handleInputChange }) {
         Get started with your name
       </h2>
       <div className="flex flex-col sm:flex-row gap-5">
-        <input
+        <Input
           type="text"
           placeholder="First Name"
-          className="text-base lg:text-lg bg-white outline-none focus:border-[#F2C146] w-52 border-[3px] p-2 rounded-lg"
+          className={true}
           value={bio.firstname}
-          onChange={(e) => handleInputChange("firstname", e.target.value)}
+          onChange={(value) => handleInputChange("firstname", value)}
         />
-        <input
+
+        <Input
           type="text"
           placeholder="Last Name"
-          className="text-base lg:text-lg bg-white outline-none focus:border-[#F2C146] w-52 border-[3px] p-2 rounded-lg"
+          className={true}
           value={bio.lastname}
-          onChange={(e) => handleInputChange("lastname", e.target.value)}
+          onChange={(value) => handleInputChange("lastname", value)}
         />
       </div>
     </div>

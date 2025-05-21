@@ -10,6 +10,10 @@ export default function Input({
   label,
   placeholder,
   parentWidth,
+  icon,
+  iconStyles,
+  onIconPress,
+  onKeyPress,
 }) {
   const [showPassword, setShowPassword] = useState(false);
   const theme = {
@@ -34,7 +38,7 @@ export default function Input({
       )}
       <div
         className={`${
-          type === "password"
+          type === "password" || icon
             ? "flex flex-row justify-between items-center relative"
             : ``
         }`}
@@ -44,6 +48,7 @@ export default function Input({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disable}
+          onKeyDown={(e) => onKeyPress(e)}
           type={type === "password" ? (showPassword ? "text" : type) : type}
           placeholder={placeholder}
         />
@@ -53,6 +58,17 @@ export default function Input({
             onClick={() => setShowPassword(!showPassword)}
           >
             {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+          </span>
+        )}
+        {icon && (
+          <span
+            onClick={(e) => {
+              e.stopPropagation();
+              onIconPress();
+            }}
+            className={`cursor-pointer absolute right-2 ${iconStyles}`}
+          >
+            {icon}
           </span>
         )}
       </div>

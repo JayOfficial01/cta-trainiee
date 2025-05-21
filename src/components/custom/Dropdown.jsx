@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export default function Dropdown({
+  state,
   trigger,
   children,
   bg,
@@ -11,10 +12,14 @@ export default function Dropdown({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
+  const isPassed = state !== undefined;
+  const hasOpen = isPassed ? state.state : open;
+  const setHasOpen = isPassed ? state.setState : setOpen;
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
+        setHasOpen(false);
       }
     };
 
@@ -23,22 +28,25 @@ export default function Dropdown({
   }, []);
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
-      <div onClick={() => setOpen((prev) => !prev)} className="cursor-pointer">
+    <div className="relative" ref={dropdownRef}>
+      <div
+        onClick={() => setHasOpen((prev) => !prev)}
+        className="cursor-pointer"
+      >
         {trigger}
       </div>
 
-      {open && (
+      {hasOpen ? (
         <article
           className={`absolute  ${position ? position : ""} ${
             bg ? bg : ""
-          } shadow-lg rounded-md z-10 whitespace-nowrap ${
-            styles ? styles : ""
-          }`}
-          onClick={() => (onSelectClose ? setOpen(() => false) : "")}
+          } shadow-lg z-10 whitespace-nowrap ${styles ? styles : ""}`}
+          onClick={() => (onSelectClose ? setHasOpen(false) : "")}
         >
           {children}
         </article>
+      ) : (
+        ""
       )}
     </div>
   );

@@ -5,6 +5,7 @@ import ThirdStep from "./third-step";
 import FourthStep from "./fourth-step";
 import { FaAngleLeft } from "react-icons/fa";
 import FifthStep from "./fifth-step";
+import { Button } from "@/components/custom";
 
 const educationLevels = [
   "Early childhood education",
@@ -28,7 +29,9 @@ const interestsOptions = [
 ];
 
 export default function OpeningForm() {
-  const [activeId, setActiveId] = useState(5);
+  const [activeId, setActiveId] = useState(
+    parseInt(localStorage.getItem("form-id")) || 1
+  );
   const [progressPercentage, setProgressPercentage] = useState("20");
   const [disabled, setDisabled] = useState(false);
   const [bio, setBio] = useState({
@@ -48,6 +51,7 @@ export default function OpeningForm() {
   }
 
   useEffect(() => {
+    localStorage.setItem("form-id", activeId);
     const { firstname, lastname, date, course, interest, description } = bio;
     switch (activeId) {
       case 1:
@@ -72,6 +76,11 @@ export default function OpeningForm() {
         return setProgressPercentage("20");
     }
   }, [activeId, bio]);
+
+  function handleUpdateSettings() {
+    const url =
+      "https://course.cta.uat.api.codibot.ai/api/v1.5.0/tenant/account/settings";
+  }
 
   return (
     <div
@@ -141,16 +150,14 @@ export default function OpeningForm() {
           <FifthStep bio={bio} handleInputChange={handleInputChange} />
         )}
         {/*  Button to go to next step */}
-        <button
+        <Button
+          text="Next"
+          className={`font-semibold text-sm sm:text-base rounded-full border-[1px] border-[#F5F5F5] mt-7 text-white bg-gradient-to-r hover:scale-105 transition-transform transform duration-200 from-[#007F5F] to-[#01B688] px-6 py-2 shadow-md ${
+            disabled ? "cursor-not-allowed" : "cursor-pointer"
+          } disabled:opacity-50 `}
+          disable={disabled}
           onClick={() => (activeId < 5 ? setActiveId(activeId + 1) : "")}
-          disabled={disabled}
-          className="font-semibold text-sm sm:text-base rounded-full border-[1px] border-[#F5F5F5] mt-7 text-white bg-gradient-to-r hover:scale-105 transition-transform transform duration-200 from-[#007F5F] to-[#01B688] px-6 py-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            cursor: `${disabled ? "" : "pointer"}`,
-          }}
-        >
-          Next
-        </button>
+        />
       </div>
     </div>
   );

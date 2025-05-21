@@ -6,7 +6,7 @@ export default function Congratulations({ course }) {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full h-[100%] flex flex-col justify-center items-center bg-emerald-100 rounded-lg text-center gap-5">
+    <div className="w-full h-[100%] flex flex-col justify-center items-center bg-emerald-100 rounded-lg text-center gap-5 p-10">
       <div className="bg-transparent">
         <lottie-player
           autoplay

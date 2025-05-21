@@ -14,7 +14,7 @@ export default function ThirdStep({ educationLevels, bio, handleInputChange }) {
             name="education_level"
             id="course"
             checked={bio.course === level ? true : false}
-            onChange={(e) => handleInputChange("course", level)}
+            onChange={() => handleInputChange("course", level)}
             className="mr-2 sm:w-4 sm:h-4 cursor-pointer"
           />
           {level}

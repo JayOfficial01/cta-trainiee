@@ -2,7 +2,6 @@ import { Button } from "@/components/custom";
 
 export default function Card(props) {
   const {
-    courseId,
     image,
     activity,
     title,
@@ -11,6 +10,8 @@ export default function Card(props) {
     isDownloading,
     onDownload,
     onCourseDescription,
+    onUpdate,
+    toSlides,
   } = props;
   return (
     <div
@@ -70,10 +71,11 @@ export default function Card(props) {
               hasCard={true}
               bg="from-[#007F5F] to-[#01B688]"
               text="Start Again"
+              onClick={toSlides}
             />
             <Button
               hasCard={true}
-              onClick={() => onDownload()}
+              onClick={onDownload}
               bg={
                 isDownloading
                   ? "bg-gray-500 cursor-not-allowed"
@@ -94,6 +96,7 @@ export default function Card(props) {
                 ? "bg-yellow-500"
                 : "bg-blue-500"
             }
+            onClick={onUpdate}
             text={
               activity === "ASSIGNED"
                 ? "Start Now"

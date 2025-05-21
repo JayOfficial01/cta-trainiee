@@ -16,6 +16,7 @@ export default function CarouselButtons({
   setQuizLoading,
   setQuizTaken,
   goToQuiz,
+  SendEventRequest,
 }) {
   const slides = useSelector((state) => state.slides.slides);
   const length = slides.length;
@@ -38,18 +39,19 @@ export default function CarouselButtons({
       if (document.fullscreenElement || document.webkitFullscreenElement) {
         ExitFullScreen();
       }
-      return goToQuiz(slide_content, notes, slides[currentSlide]?.mandatory);
+      goToQuiz(slide_content, notes, slides[currentSlide]?.mandatory);
     }
     setCurrentSlide((prev) => prev + 1);
+    SendEventRequest();
   };
 
   const handlePrev = () => {
-    if (currentSlide === length) {
-      setHasSlidesTaken(() => false);
+    if (currentSlide === length && hasSlidesTaken) {
+      return setHasSlidesTaken(() => false);
+    } else {
+      if (currentSlide === 1) return;
       return setCurrentSlide((prev) => prev - 1);
     }
-    if (currentSlide === 1) return;
-    setCurrentSlide((prev) => prev - 1);
   };
 
   return (

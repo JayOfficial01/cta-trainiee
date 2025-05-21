@@ -8,6 +8,9 @@ import Description from "./Description";
 import Dropdown from "./Dropdown";
 import Switch from "./Switch";
 import Question from "./Question";
+import Modal from "./Modal";
+import Tab from "./Tab";
+import Select from "./Select";
 
 export {
   Input,
@@ -19,4 +22,7 @@ export {
   Dropdown,
   Switch,
   Question,
+  Modal,
+  Tab,
+  Select,
 };

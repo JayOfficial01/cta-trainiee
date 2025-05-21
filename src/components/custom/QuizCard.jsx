@@ -1,25 +1,77 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/custom";
 import "@lottiefiles/lottie-player";
 import { RxCross2 } from "react-icons/rx";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
+import axios from "axios";
 
-export default function QuizCard({ quizes, setShowQuiz, mandatory }) {
+export default function QuizCard({
+  quizes,
+  setShowQuiz,
+  mandatory,
+  courseId,
+  courseName,
+  currentSlide,
+}) {
+  const currUser = useSelector((state) => state.user);
+  const meta = useSelector((state) => state.meta);
+  const slides = useSelector((state) => state.slides.slides);
   const [answers, setAnswers] = useState(0);
   const [congrats, setCongrats] = useState(false);
   const [current, setCurrent] = useState(0);
   const [check, setCheck] = useState(null);
+  const startTime = Date.now();
 
   function handleNext(index) {
     if (!check) {
       return toast("Select some option");
     }
     setCheck(null);
+    const endTime = Date.now();
+    const timeSpent = (endTime - startTime) / 1000;
+
+    const payload = {
+      event_id: JSON.stringify(Date.now()),
+      student_id: currUser.id,
+      student_level: currUser.education,
+      course_id: JSON.stringify(courseId),
+      course_title: courseName,
+      event_type: "short_assessment",
+      timestamp: new Date(Date.now()).toISOString(),
+      session_id: JSON.stringify(Date.now()),
+      interaction_type: "submission",
+      metadata: meta,
+      data: {
+        context: "assessment_short",
+        details: {
+          slide_title: slides[currentSlide - 1]?.slide_title || "Unknown Title",
+          slide_no: currentSlide,
+          start_time: startTime,
+          end_time: endTime,
+          duration_mins: Math.round(timeSpent / 60),
+          score: answers,
+        },
+      },
+    };
+
+    const url =
+      "https://reporting.cta.uat.api.codibot.ai/api/v1/analytics/event";
+
     if (index + 1 === quizes.length) {
       setCongrats(() => true);
       return setCurrent(0);
     }
     setCurrent(index + 1);
+    axios
+      .post(url, payload, {
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json",
+          Authorization: `Bearer ${currUser.token}`,
+        },
+      })
+      .catch((err) => console.log(err));
   }
 
   function handleAnswers(selectedOption, mainAnswer) {
@@ -57,7 +109,7 @@ export default function QuizCard({ quizes, setShowQuiz, mandatory }) {
               </h2>
               <p>
                 You Scored:{" "}
-                <span className="text-emerald-700 font-bold">
+                <span className="text-emerald-700 font-bold text-2xl">
                   {answers}/{quizes.length}
                 </span>
               </p>

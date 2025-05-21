@@ -14,6 +14,8 @@ import Coursedescription from "./pages/course-description/course-description";
 import Slides from "./pages/slides/slides";
 import Assessment from "./pages/assessment/assessment";
 import SuccessScore from "./pages/success-score/success-score";
+import ErrorPage from "./pages/404/ErrorPage";
+import UserMetaAPI from "./pages/before-api/usermetaapi";
 
 function App() {
   const hasLogged = useSelector((state) => state.signed);
@@ -40,34 +42,37 @@ function App() {
         {/* Public Route in case the user hasn't logged in */}
         <Route path="/login" element={<Account />} />
         <Route path="/forgot-password" element={<Account />} />
+        <Route path="*" element={<ErrorPage />} />
 
         {/* Private Routes only access when user logged in */}
         <Route element={<Logged />}>
           <Route path="/openingform" element={<OpeningForm />} />
           <Route path="/otp" element={<Account />} />
-          <Route
-            element={
-              <>
-                <Header currUser={user} />
-                <Outlet />
-              </>
-            }
-          >
-            <Route path="/" element={<Landing currUser={user} />} />
+          <Route element={<UserMetaAPI />}>
             <Route
-              path="/account-setting"
-              element={<AccountSetting currUser={user} />}
-            />
-            <Route
-              path="/coursedescription"
-              element={<Coursedescription currUser={user} />}
-            />
-            <Route path="/slides" element={<Slides currUser={user} />} />
-            <Route
-              path="/assessment"
-              element={<Assessment currUser={user} />}
-            />
-            <Route path="/successscore" element={<SuccessScore />} />
+              element={
+                <>
+                  <Header currUser={user} />
+                  <Outlet />
+                </>
+              }
+            >
+              <Route path="/" element={<Landing currUser={user} />} />
+              <Route
+                path="/account-setting"
+                element={<AccountSetting currUser={user} />}
+              />
+              <Route
+                path="/coursedescription"
+                element={<Coursedescription currUser={user} />}
+              />
+              <Route path="/slides" element={<Slides currUser={user} />} />
+              <Route
+                path="/assessment"
+                element={<Assessment currUser={user} />}
+              />
+              <Route path="/successscore" element={<SuccessScore />} />
+            </Route>
           </Route>
         </Route>
       </Routes>

@@ -7,6 +7,8 @@ const user = createSlice({
     name: "",
     email: "",
     token: "",
+    isUpdated: false,
+    education: "",
   },
   reducers: {
     setUser: (state, action) => {
@@ -21,8 +23,14 @@ const user = createSlice({
       state.email = "";
       state.token = "";
     },
+    isUpdated: (state) => {
+      state.isUpdated = !state.isUpdated;
+    },
+    setEducation: (state, action) => {
+      state.education = action.payload;
+    },
   },
 });
 
-export const { setUser, setAdditionalInformation, resetUser } = user.actions;
+export const { setUser, resetUser, isUpdated, setEducation } = user.actions;
 export default user.reducer;

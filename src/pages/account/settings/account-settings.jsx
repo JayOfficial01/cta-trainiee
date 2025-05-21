@@ -1,10 +1,12 @@
 import Loader from "@/pages/loader/Loader";
 import { Plus } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { handleUpdateSettings } from "./handleUpdateSettings";
 import { Input } from "@/components/custom";
 import { Button } from "@/components/custom";
 import { fetchUserInformation } from "./fetchUserInformation";
+import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { isUpdated } from "@/pages/redux/user-slice";
 
 const educationLevels = [
   "Early childhood education",
@@ -27,13 +29,14 @@ export default function AccountSetting({ currUser }) {
     profile_pic: "",
   });
   const [loading, setLoading] = useState(true);
-  const [updated, setUpdated] = useState(false);
+  const update = useSelector((state) => state.user.isUpdated);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const url =
       "https://course.cta.uat.api.codibot.ai/api/v1.5.0/tenant/account/settings";
     fetchUserInformation(url, currUser.token, setBio, setLoading);
-  }, [updated]);
+  }, [update]);
 
   // Image Ref
   const imageRef = useRef(null);
@@ -50,6 +53,49 @@ export default function AccountSetting({ currUser }) {
     const url = URL.createObjectURL(blob);
     imageRef.current.src = url;
     setBio({ ...bio, profile_pic: url });
+    if (blob) handleImageUpload(blob);
+  }
+
+  function handleImageUpload(file) {
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const url = `https://course.cta.uat.api.codibot.ai/api/v1.5.0/resource?resource_type=user&user_id=${currUser.id}`;
+    axios
+      .post(
+        url,
+        { files: file },
+        {
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${currUser.token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then((resp) => {
+        const picture = resp?.data?.uploaded_files[0]?.url;
+        setBio({
+          ...bio,
+          profile_pic: picture,
+        });
+        dispatch(isUpdated());
+      })
+      .catch((err) => console.log(err));
+  }
+
+  function handleUpdateData() {
+    const url =
+      "https://course.cta.uat.api.codibot.ai/api/v1.5.0/tenant/account/settings";
+    axios
+      .put(url, bio, {
+        headers: {
+          accept: "application/json",
+          Authorization: `Bearer ${currUser.token}`,
+        },
+      })
+      .then(() => dispatch(isUpdated()))
+      .catch((err) => console.log(err));
   }
 
   return loading ? (
@@ -64,14 +110,6 @@ export default function AccountSetting({ currUser }) {
         className="mt-10 w-[100%] xl:w-[30%]"
         onSubmit={async (e) => {
           e.preventDefault();
-          setLoading(true);
-          await handleUpdateSettings(
-            currUser.id,
-            currUser.token,
-            setUpdated,
-            updated
-          );
-          setLoading(false);
         }}
       >
         <article className="flex gap-4 mt-3 items-center">
@@ -162,7 +200,10 @@ export default function AccountSetting({ currUser }) {
               className="w-full p-2 border rounded-md border-zinc-500 outline-none"
             ></textarea>
           </div>
-          <Button className="w-fit px-5 py-2 bg-[#007F5F] rounded-md text-white text-base cursor-pointer">
+          <Button
+            onClick={handleUpdateData}
+            className="w-fit px-5 py-2 bg-[#007F5F] rounded-md text-white text-base cursor-pointer"
+          >
             Submit
           </Button>
         </article>

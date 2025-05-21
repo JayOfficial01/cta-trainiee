@@ -1,15 +1,10 @@
 import { useEffect, useState } from "react";
 import { FaChevronDown, FaGraduationCap, FaSignOutAlt } from "react-icons/fa";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { resetUser } from "../redux/user-slice";
+import { resetUser, setEducation } from "../redux/user-slice";
 import { Link, useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Dropdown } from "@/components/custom";
+import axios from "axios";
 
 export default function Header({ currUser }) {
   const dispatch = useDispatch();
@@ -18,38 +13,30 @@ export default function Header({ currUser }) {
     lastname: "",
     profile_pic: "",
   });
+  const update = useSelector((state) => state.user.isUpdated);
   const navigate = useNavigate();
 
   useEffect(() => {
-    try {
-      const url =
-        "https://course.cta.uat.api.codibot.ai/api/v1.5.0/tenant/account/settings";
-      (async () => {
-        try {
-          const isFetch = await fetch(url, {
-            headers: {
-              accept: "application/json",
-              Authorization: `Bearer ${currUser.token}`,
-            },
-          });
-          if (isFetch.status != 200) {
-            return console.log(err);
-          }
-          const isResp = await isFetch.json();
-          const { first_name, last_name, profile_pic } = isResp.data;
-          return setBio({
-            firstname: first_name,
-            lastname: last_name,
-            profile_pic: profile_pic,
-          });
-        } catch (err) {
-          console.log(err);
-        }
-      })();
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+    const url =
+      "https://course.cta.uat.api.codibot.ai/api/v1.5.0/tenant/account/settings";
+    axios(url, {
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${currUser.token}`,
+      },
+    })
+      .then((resp) => {
+        const { first_name, last_name, profile_pic, level_of_education } =
+          resp.data.data;
+        setBio({
+          firstname: first_name,
+          lastname: last_name,
+          profile_pic: profile_pic,
+        });
+        dispatch(setEducation(level_of_education));
+      })
+      .catch((err) => console.log(err));
+  }, [update]);
 
   function handleLogout() {
     localStorage.clear();

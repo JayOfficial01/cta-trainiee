@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSlides, clearSlides } from "../redux/slides-slice";
 import Loader from "../loader/Loader";
 import "@lottiefiles/lottie-player";
-import { handleBlur, handleMouse } from "./handle-fn/handleScreenSaver";
 import Congratulations from "./sub-components/Congratulation";
 import CarouselButtons from "./sub-components/Carousel-buttons";
 import axios from "axios";
@@ -21,21 +20,22 @@ import Quiz from "../quiz/Quiz";
 import { setMandatory, setQuizes } from "../redux/quiz-slice";
 import { RiBatterySaverFill } from "react-icons/ri";
 import { GrResources } from "react-icons/gr";
-import { MdOutlineMicNone } from "react-icons/md";
 import { BsChatDots } from "react-icons/bs";
 import Notes from "./tabs/notes";
 import ResourceTab from "./tabs/resources-tab";
+import CodiTutor from "./tabs/codi-tutor/codi-tutor";
+import { FaMicrophone } from "react-icons/fa";
+import { SendEventAPI } from "./handle-fn/fnEventAPI";
+import Chat from "./tabs/chat/chat";
 
 export default function Slides({ currUser }) {
-  // To check if the a course is selected
   const location = useLocation();
   if (!location.state?.id || !location.state?.name) return <Navigate to="/" />;
 
-  // Redux
   const slides = useSelector((state) => state.slides.slides);
+  const meta = useSelector((state) => state.meta);
   const dispatch = useDispatch();
 
-  // states
   const [currentSlide, setCurrentSlide] = useState(
     parseInt(localStorage.getItem(`${location.state?.id}currentSlide`)) || 1
   );
@@ -50,9 +50,7 @@ export default function Slides({ currUser }) {
   const [quizTaken, setQuizTaken] = useState([]);
   const [activeTab, setActiveTab] = useState("");
 
-  // Refs
-  const startTimeRef = useRef(null);
-  const hasTriggeredRef = useRef(false);
+  const currentTime = Date.now();
   const viewFullScreen = useRef(null);
 
   useEffect(() => {
@@ -69,7 +67,6 @@ export default function Slides({ currUser }) {
         })
         .then((resp) => {
           dispatch(setSlides(resp.data.resources));
-          console.log(resp.data.resources);
         })
         .catch((err) => console.log(err));
     } catch (err) {
@@ -99,7 +96,6 @@ export default function Slides({ currUser }) {
 
   useEffect(() => {
     return () => {
-      console.log("clicked");
       dispatch(clearSlides());
     };
   }, []);
@@ -119,6 +115,159 @@ export default function Slides({ currUser }) {
     );
     return response.data.data;
   };
+
+  // useEffect(() => {
+  //   let timeoutId = null;
+  //   let lastX = null;
+  //   let lastY = null;
+  //   let currentTime = null;
+  //   let hasRequestSent = false;
+  //   let wasIdle = false;
+
+  //   const setIdleTimer = () => {
+  //     clearTimeout(timeoutId);
+  //     timeoutId = setTimeout(() => {
+  //       setScreenSaver(true);
+  //       wasIdle = true;
+
+  //       if (!hasRequestSent) {
+  //         hasRequestSent = true;
+  //         SendEventAPI(
+  //           currentTime,
+  //           currUser,
+  //           location.state.id,
+  //           location.state.name,
+  //           meta
+  //         );
+  //       }
+  //     }, 12000);
+  //   };
+
+  //   const handleMouseMove = (e) => {
+  //     const { clientX, clientY } = e;
+
+  //     if (clientX !== lastX || clientY !== lastY) {
+  //       lastX = clientX;
+  //       lastY = clientY;
+
+  //       if (wasIdle) {
+  //         setScreenSaver(false);
+  //         currentTime = Date.now();
+  //         wasIdle = false;
+  //         hasRequestSent = false;
+  //       }
+
+  //       setIdleTimer();
+  //     }
+  //   };
+
+  //   const handleBlur = () => {
+  //     setScreenSaver(true);
+  //     currentTime = Date.now();
+  //     wasIdle = true;
+
+  //     if (!hasRequestSent) {
+  //       hasRequestSent = true;
+  //       SendEventAPI(
+  //         currentTime,
+  //         currUser,
+  //         location.state.id,
+  //         location.state.name,
+  //         meta
+  //       );
+  //     }
+  //   };
+
+  //   const handleFocus = () => {
+  //     if (wasIdle) {
+  //       setScreenSaver(false);
+  //       wasIdle = false;
+  //       hasRequestSent = false;
+  //     }
+  //   };
+
+  //   window.addEventListener("mousemove", handleMouseMove);
+  //   window.addEventListener("blur", handleBlur);
+  //   window.addEventListener("focus", handleFocus);
+
+  //   setIdleTimer();
+
+  //   return () => {
+  //     clearTimeout(timeoutId);
+  //     window.removeEventListener("mousemove", handleMouseMove);
+  //     window.removeEventListener("blur", handleBlur);
+  //     window.removeEventListener("focus", handleFocus);
+  //   };
+  // }, [showQuiz]); // re-run effect if showQuiz state changes
+
+  const startTimeRef = useRef(null);
+  const hasTriggeredRef = useRef(false);
+
+  useEffect(() => {
+    let hasFocus = true;
+    let lastX = null;
+    let lastY = null;
+    let timer = null;
+
+    function handleFocus() {
+      hasFocus = true;
+    }
+
+    function handleBlur() {
+      hasFocus = false;
+      startTimeRef.current = Date.now();
+      hasTriggeredRef.current = false;
+
+      timer = setTimeout(() => {
+        if (!hasFocus) {
+          setScreenSaver(true);
+        }
+      }, 120000);
+    }
+
+    function handleMouse(e) {
+      const { clientX, clientY } = e;
+
+      if (clientX === lastX && clientY === lastY) return;
+      lastX = clientX;
+      lastY = clientY;
+
+      clearTimeout(timer);
+
+      timer = setTimeout(() => {
+        setScreenSaver(true);
+        hasFocus = false;
+        startTimeRef.current = Date.now();
+        hasTriggeredRef.current = false;
+      }, 120000);
+
+      if (screenSaver) {
+        setScreenSaver(false);
+
+        if (!hasTriggeredRef.current && startTimeRef.current) {
+          SendEventAPI(
+            startTimeRef.current,
+            currUser,
+            location.state.id,
+            location.state.name,
+            meta
+          );
+          hasTriggeredRef.current = true;
+        }
+      }
+    }
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+    window.addEventListener("mousemove", handleMouse);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+      window.removeEventListener("mousemove", handleMouse);
+      clearTimeout(timer);
+    };
+  }, [screenSaver]);
 
   return slides.length === 0 ? (
     <article className="col-span-full">
@@ -143,7 +292,14 @@ export default function Slides({ currUser }) {
         />
       )}
 
-      {showQuiz && <Quiz setShowQuiz={setShowQuiz} />}
+      {showQuiz && (
+        <Quiz
+          setShowQuiz={setShowQuiz}
+          courseId={location.state.id}
+          courseName={location.state.name}
+          currentSlide={currentSlide}
+        />
+      )}
 
       <div className="custom-container flex justify-between items-center pt-5 pb-2  relative">
         <p className="font-bold text-xl xl:text-3xl text-[#3A3A3C] w-[60%] sm:w-auto">
@@ -209,10 +365,10 @@ export default function Slides({ currUser }) {
               slides[currentSlide - 1]?.slide_layout,
               slides[currentSlide - 1]
             )}
+            currentSlide={currentSlide}
           />
         )}
 
-        {/* Carousel Progress and Buttons */}
         {!slides[currentSlide - 1]?.azure_url && (
           <CarouselButtons
             setCurrentSlide={setCurrentSlide}
@@ -228,104 +384,72 @@ export default function Slides({ currUser }) {
                 .then((resp) => {
                   dispatch(setQuizes(resp));
                   dispatch(setMandatory(mandatory));
-                  setShowQuiz(() => true);
-                  setQuizLoading(() => false);
+                  setShowQuiz(true);
+                  setQuizLoading(false);
                 })
                 .catch(() => {
                   toast("Failed to load quiz");
-                  setQuizLoading(() => false);
+                  setQuizLoading(false);
                 });
             }}
+            SendEventRequest={() =>
+              SendEventAPI(
+                currentTime,
+                currUser,
+                location.state.id,
+                location.state.name,
+                meta
+              )
+            }
           />
         )}
-      </section>
-      <section className="w-[90%] md:w-[75%] mx-auto mt-20 mb-20">
-        <article className="grid md:grid-cols-4 gap-4 items-center">
-          <h2
-            className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
-              activeTab === "Notes" ? "border-b-4 border-b-emerald-600" : ""
-            }
-             transition-all ease-in-out pb-5 text-xl`}
-            onClick={() => setActiveTab("Notes")}
-          >
-            <RiBatterySaverFill
-              size={35}
-              className={` ${
-                activeTab === "Notes"
-                  ? "bg-emerald-600 text-white"
-                  : "bg-[#C0E9D7] text-black"
-              } rounded-full p-2 mr-3`}
-            />
-            Notes
-          </h2>
-          <h2
-            className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
-              activeTab === "Resources" ? "border-b-4 border-b-emerald-600" : ""
-            }
-             transition-all ease-in-out pb-5 text-xl`}
-            onClick={() => setActiveTab("Resources")}
-          >
-            <GrResources
-              size={35}
-              className={`${
-                activeTab === "Resources"
-                  ? "bg-emerald-600 text-white border-b-emerald-600"
-                  : "bg-[#C0E9D7] text-black"
-              } rounded-full p-2 mr-3`}
-            />
-            Resources
-          </h2>
-          <h2
-            className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
-              activeTab === "Codi Tutor"
-                ? "border-b-4 border-b-emerald-600"
-                : ""
-            }
-             transition-all ease-in-out pb-5 text-xl`}
-            onClick={() => setActiveTab("Codi Tutor")}
-          >
-            <MdOutlineMicNone
-              size={35}
-              className={`${
-                activeTab === "Codi Tutor"
-                  ? "bg-emerald-600 text-white border-b-emerald-600"
-                  : "bg-[#C0E9D7] text-black"
-              } rounded-full p-2 mr-3`}
-            />
-            Codi Tutor
-          </h2>
-          <h2
-            className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
-              activeTab === "Chat with AI"
-                ? "border-b-4 border-b-emerald-600"
-                : ""
-            }
-             transition-all ease-in-out pb-5 text-xl`}
-            onClick={() => setActiveTab("Chat with AI")}
-          >
-            <BsChatDots
-              size={35}
-              className={`${
-                activeTab === "Chat with AI"
-                  ? "bg-emerald-600 text-white border-b-emerald-600"
-                  : "bg-[#C0E9D7] text-black"
-              } rounded-full p-2 mr-3`}
-            />
-            Chat with AI
-          </h2>
-        </article>
-        {activeTab ? (
-          <section className="border-1 border-zinc-600 rounded-xs p-2 h-[300px]">
-            {activeTab === "Notes" && (
-              <Notes notes={slides[currentSlide - 1].notes} />
-            )}
-            {activeTab === "Resources" && (
-              <ResourceTab resources={slides[currentSlide - 1].resources} />
-            )}
-          </section>
-        ) : (
-          ""
-        )}
+
+        <section className="mt-20 mb-20">
+          <article className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 items-center">
+            {/* Tabs */}
+            {[
+              { label: "Notes", Icon: RiBatterySaverFill },
+              { label: "Resources", Icon: GrResources },
+              { label: "Codi Tutor", Icon: FaMicrophone },
+              { label: "Chat with AI", Icon: BsChatDots },
+            ].map(({ label, Icon }) => (
+              <h2
+                key={label}
+                onClick={() => setActiveTab(label)}
+                className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
+                  activeTab === label ? "border-b-4 border-b-emerald-600" : ""
+                } transition-all ease-in-out pb-5 text-xl`}
+              >
+                <Icon
+                  size={35}
+                  className={`${
+                    activeTab === label
+                      ? "bg-emerald-600 text-white"
+                      : "bg-[#C0E9D7] text-black"
+                  } rounded-full p-2 mr-3`}
+                />
+                {label}
+              </h2>
+            ))}
+          </article>
+
+          {activeTab && (
+            <>
+              {activeTab === "Notes" && (
+                <Notes notes={slides[currentSlide - 1].notes} />
+              )}
+              {activeTab === "Resources" && (
+                <ResourceTab resources={slides[currentSlide - 1].resources} />
+              )}
+              {activeTab === "Codi Tutor" && (
+                <CodiTutor courseId={location.state.id} currId={currUser.id} />
+              )}
+              {activeTab === "Chat with AI" && (
+                <Chat currUser={currUser} courseId={location.state.id} />
+              )}
+            </>
+          )}
+        </section>
       </section>
     </>
   );

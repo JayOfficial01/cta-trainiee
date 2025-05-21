@@ -3,7 +3,7 @@ import TalkWithBot from "./talkwithbot";
 import { Button } from "@/components/custom";
 import TalkSettings from "./talksettings";
 
-export default function CodiTutor({ courseId, currId }) {
+export default function CodiTutor({ courseId, currId, webEnable, ragEnable }) {
   const [startConversation, setStartConversation] = useState(false);
 
   return (
@@ -14,6 +14,8 @@ export default function CodiTutor({ courseId, currId }) {
             setStartConversation={setStartConversation}
             courseId={courseId}
             currId={currId}
+            webEnable={webEnable}
+            ragEnable={ragEnable}
           />
         ) : (
           <>

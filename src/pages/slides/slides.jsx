@@ -442,10 +442,20 @@ export default function Slides({ currUser }) {
                 <ResourceTab resources={slides[currentSlide - 1].resources} />
               )}
               {activeTab === "Codi Tutor" && (
-                <CodiTutor courseId={location.state.id} currId={currUser.id} />
+                <CodiTutor
+                  courseId={location.state.id}
+                  currId={currUser.id}
+                  webEnable={webSearch}
+                  ragEnable={docSearch}
+                />
               )}
               {activeTab === "Chat with AI" && (
-                <Chat currUser={currUser} courseId={location.state.id} />
+                <Chat
+                  currUser={currUser}
+                  courseId={location.state.id}
+                  webEnable={webSearch}
+                  ragEnable={docSearch}
+                />
               )}
             </>
           )}

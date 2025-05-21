@@ -25,7 +25,7 @@ export default function SlideMenu(props) {
         <p>Web Search</p>
         <Switch
           onChange={() => {
-            setWebSearch(true);
+            setWebSearch((prev) => !prev);
             docSearch ? setDocSearch(false) : "";
           }}
           open={webSearch}
@@ -35,7 +35,7 @@ export default function SlideMenu(props) {
         <p>Doc Search</p>
         <Switch
           onChange={() => {
-            webSearch ? setWebSearch(false) : "";
+            webSearch ? setWebSearch((prev) => !prev) : "";
             setDocSearch(true);
           }}
           open={docSearch}

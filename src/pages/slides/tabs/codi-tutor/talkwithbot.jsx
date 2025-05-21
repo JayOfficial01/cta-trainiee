@@ -7,7 +7,8 @@ import { handleStop } from "./handle-fn/handleStop";
 import { useSelector } from "react-redux";
 
 export default function TalkWithBot(props) {
-  const { courseId, setStartConversation, currId } = props;
+  const { courseId, setStartConversation, currId, webEnable, ragEnable } =
+    props;
 
   // selectors
   const config = useSelector((state) => state.tutor);
@@ -79,7 +80,7 @@ export default function TalkWithBot(props) {
   // <-- Request Payload Start -->
   const payload = {
     text_to_speech_conversion: false,
-    enable_RAG: false,
+    enable_RAG: ragEnable,
     enable_internet_search: false,
     transcription_prompt: "",
     text: "",

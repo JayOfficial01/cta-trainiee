@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { FaArrowRight } from "react-icons/fa";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function Chat({ currUser, courseId }) {
+export default function Chat({ currUser, courseId, webEnable, ragEnable }) {
   const chats = useSelector((state) => state.chat);
   const dispatch = useDispatch();
 
@@ -50,8 +50,8 @@ export default function Chat({ currUser, courseId }) {
       query: text,
       v2v: false,
       tools: {
-        rag: false,
-        web_search: true,
+        rag: ragEnable,
+        web_search: webEnable,
       },
     };
     axios

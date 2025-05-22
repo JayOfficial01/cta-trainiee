@@ -30,10 +30,6 @@ export async function handleLogin(bio) {
       }
     );
 
-    if (request.status != 200) {
-      return { failure: true };
-    }
-
     const data = request.data.data;
     const storage = check ? localStorage : sessionStorage;
 
@@ -44,6 +40,6 @@ export async function handleLogin(bio) {
 
     return true;
   } catch (err) {
-    return { failure: err.name, message: err.message };
+    return err;
   }
 }

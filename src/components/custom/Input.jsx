@@ -48,7 +48,7 @@ export default function Input({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           disabled={disable}
-          onKeyDown={(e) => onKeyPress(e)}
+          onKeyDown={(e) => onKeyPress && onKeyPress(e)}
           type={type === "password" ? (showPassword ? "text" : type) : type}
           placeholder={placeholder}
         />

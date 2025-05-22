@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { setSign } from "@/pages/redux/log-indicator";
 import { useNavigate } from "react-router";
 import { Input, DragButton } from "@/components/custom";
+import { toast } from "sonner";
 
 export default function LoginForm() {
   const dispatch = useDispatch();
@@ -63,6 +64,8 @@ export default function LoginForm() {
               if (typeof signed === "boolean") {
                 navigate("/otp");
                 dispatch(setSign());
+              } else {
+                toast(signed.response.data.message);
               }
             })
           }

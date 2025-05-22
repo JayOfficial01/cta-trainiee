@@ -23,11 +23,9 @@ export default function ForgotPassword() {
           },
         }
       );
-      const { data } = request;
-      toast(data.message);
       return true;
     } catch (err) {
-      return { failure: err.name, message: err.message };
+      return err;
     }
   }
 
@@ -55,7 +53,7 @@ export default function ForgotPassword() {
               if (typeof received === "boolean") {
                 console.log(received);
               } else {
-                toast(`${received.failure}: ${received.message}`);
+                toast(received.response.data.message);
               }
             })
           }

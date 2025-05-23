@@ -19,12 +19,12 @@ export default function LoginForm() {
   return (
     <aside className="w-full sm:w-[50vw] md:w-[45vw] flex justify-center items-center pt-[3%] h-[100%] bg-[#05A179]">
       <form className="space-y-6 w-full lg:w-[80%] px-10 sm:px-5 text-white">
-        <div className="flex flex-col items-center gap-2 mb-14">
+        <div className="flex flex-col items-center gap-2 mb-8">
           <picture className="flex mb-5">
             <img
               src="./assets/dar-e-arqam-clg-logo.png"
               alt="Dar-e-arqam Logo"
-              className="w-[300px]"
+              className="w-[230px] rounded-md"
             />
           </picture>
           <h1 className="text-3xl sm:text-4xl font-bold tracking-wide uppercase">
@@ -61,15 +61,14 @@ export default function LoginForm() {
           text="Scroll to Login"
           handleForm={() =>
             handleLogin(bio).then((signed) => {
+
+              console.log("signed==>", signed)
+
               if (typeof signed === "boolean") {
                 navigate("/otp");
                 dispatch(setSign());
               } else {
-                if (signed?.response?.data?.detail) {
-                  return toast(signed?.response?.data?.detail[0]?.ctx?.reason);
-                }
-                toast(signed?.response?.data?.message);
-                console.log(signed);
+                toast(`* ${signed.response.data.message}`);
               }
             })
           }

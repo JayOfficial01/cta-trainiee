@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -94,7 +95,7 @@ export default function Landing({ currUser }) {
       </section>
       <section>
         <div className="flex flex-col justify-between">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-5">
             {courses.length === 0 ? (
               <article className="col-span-full">
                 <Loader />
@@ -148,16 +149,15 @@ export default function Landing({ currUser }) {
         </div>
       </section>
       <section
-        className={`flex flex-row w-[100%] md:w-[30%] justify-between mx-auto mt-10`}
+        className={`flex flex-row w-[100%] md:w-[25%] justify-between mx-auto mt-10`}
       >
         {totalPages.map((item) => {
           return (
             <div
-              className={`px-4 py-2 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer ${
-                item === pageNo
-                  ? "bg-gradient-to-r from-[#007F5F] to-[#01B688] text-white"
-                  : "bg-white text-[#007F5F] border border-[#007F5F]"
-              }`}
+              className={`px-4 py-2 rounded-full flex items-center justify-center w-10 h-10 cursor-pointer ${item === pageNo
+                ? "bg-gradient-to-r from-[#007F5F] to-[#01B688] text-white"
+                : "bg-white text-[#007F5F] border border-[#007F5F]"
+                }`}
               key={item}
               onClick={() => setPageNo(item)}
             >

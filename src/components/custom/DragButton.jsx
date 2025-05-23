@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useRef, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 
@@ -81,7 +82,7 @@ export default function DragButton({ text, handleForm }) {
       <div
         onMouseDown={handleMouseDown}
         ref={elemRef}
-        className="absolute flex justify-center items-center top-1 sm:top-0.5 bg-white text-[#F2C146] border border-gray-300 rounded-full h-[2.4rem] sm:h-[2.6rem] w-[2.4rem]
+        className="absolute top-1 flex justify-center items-center sm:top-1 bg-white text-[#F2C146] border border-gray-300 rounded-full h-[2.4rem] sm:h-[2.6rem] w-[2.4rem]
         sm:w-[2.6rem] text-lg cursor-grab"
         style={{
           left: `${position.x}px`,

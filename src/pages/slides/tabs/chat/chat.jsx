@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Input } from "@/components/custom";
 import { setChat } from "@/pages/redux/chat-slice";
 import axios from "axios";
@@ -103,11 +104,10 @@ export default function Chat({ currUser, courseId, webEnable, ragEnable }) {
                 className={`mb-4 ${chat.isUser ? "text-right" : "text-left"}`}
               >
                 <div
-                  className={`inline-block p-2  rounded-lg md:max-w-md max-w-xs  ${
-                    chat.isUser
+                  className={`inline-block p-2  rounded-lg md:max-w-md max-w-xs  ${chat.isUser
                       ? "bg-gradient-to-r from-[#007F5F] to-[#01B688] text-white"
                       : "bg-gray-200 text-gray-800"
-                  }`}
+                    }`}
                 >
                   <div dangerouslySetInnerHTML={{ __html: chat.text }} />
                 </div>

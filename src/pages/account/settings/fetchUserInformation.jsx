@@ -13,13 +13,14 @@ export async function fetchUserInformation(url, token, setBio, setLoading) {
     }
     const { first_name, last_name, level_of_education, about, profile_pic } =
       request.data.data;
-    setBio({
-      firstname: first_name,
-      lastname: last_name,
-      level_of_education: level_of_education,
+    setBio((prev) => ({
+      ...prev,
+      first_name: first_name,
+      last_name: last_name,
+      education_level: level_of_education,
       about: about,
       profile_pic: profile_pic,
-    });
+    }));
   } catch (err) {
     console.log(err);
   } finally {

@@ -22,11 +22,12 @@ const educationLevels = [
 
 export default function AccountSetting({ currUser }) {
   const [bio, setBio] = useState({
-    firstname: "",
-    lastname: "",
-    level_of_education: "",
+    first_name: "",
+    last_name: "",
+    email: currUser.email,
+    education_level: "",
     about: "",
-    profile_pic: "",
+    profile_pic: null,
   });
   const [loading, setLoading] = useState(true);
   const update = useSelector((state) => state.user.isUpdated);
@@ -151,8 +152,8 @@ export default function AccountSetting({ currUser }) {
                 text: "First Name *",
                 styles: true,
               }}
-              value={bio.firstname}
-              onChange={(value) => handleChange("firstname", value)}
+              value={bio.first_name}
+              onChange={(value) => handleChange("first_name", value)}
               className="w-[90%] block border rounded-md p-2 border-zinc-500 outline-none bg-none"
             />
             <Input
@@ -161,14 +162,14 @@ export default function AccountSetting({ currUser }) {
                 text: "Last Name *",
                 styles: true,
               }}
-              value={bio.lastname}
-              onChange={(value) => handleChange("lastname", value)}
+              value={bio.last_name}
+              onChange={(value) => handleChange("last_name", value)}
               className="w-[90%] block border rounded-md p-2  border-zinc-500 outline-none bg-none"
             />
           </div>
           <Input
             type="email"
-            value={currUser.email}
+            value={bio.email}
             disable={true}
             className="w-[100%] border rounded-md p-2  border-zinc-500 outline-none bg-zinc-50"
             label={{ text: "Email*", styles: true }}
@@ -179,10 +180,8 @@ export default function AccountSetting({ currUser }) {
             </label>
             <select
               className="w-full p-2 border rounded-md border-zinc-500 outline-none"
-              defaultValue={bio.level_of_education}
-              onChange={(e) =>
-                handleChange("level_of_education", e.target.value)
-              }
+              defaultValue={bio.education_level}
+              onChange={(e) => handleChange("education_level", e.target.value)}
             >
               {educationLevels.map((item) => (
                 <option key={item} value={item}>

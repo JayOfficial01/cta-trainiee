@@ -57,6 +57,7 @@ export default function Slides({ currUser }) {
   const timerRef = useRef(null);
   const posX = useRef(null);
   const posY = useRef(null);
+  const isOn = useRef(null);
 
   useEffect(() => {
     try {
@@ -122,17 +123,12 @@ export default function Slides({ currUser }) {
   };
 
   useEffect(() => {
+    let timeNow = null;
     const startTimer = () => {
       timerRef.current = setTimeout(() => {
         setScreenSaver(() => true);
-        const timeNow = Date.now();
-        SendEventAPI(
-          timeNow,
-          currUser,
-          location.state?.id,
-          location.state?.name,
-          meta
-        ).catch((err) => console.log(err));
+        isOn.current = true;
+        timeNow = Date.now();
       }, 12000);
     };
 
@@ -141,7 +137,18 @@ export default function Slides({ currUser }) {
       if (posX.current === clientX && posY.current === clientY) return;
       posX.current = clientX;
       posY.current = clientY;
-      setScreenSaver(() => false);
+      if (isOn.current) {
+        setScreenSaver(() => false);
+        SendEventAPI(
+          timeNow,
+          currUser,
+          location.state?.id,
+          location.state?.name,
+          meta
+        ).catch((err) => console.log(err));
+        isOn.current = false;
+        timeNow = null;
+      }
       clearTimeout(timerRef.current);
       startTimer();
     }

@@ -9,7 +9,7 @@ export async function handleLogin(bio) {
   if (!email.includes("@") || !email.includes(".com"))
     return { response: { data: { message: "Invalid Email" } } };
   if (!/^[0-9A-Za-z]*$/.test(password))
-    return { response: { data: { message: "Invalid Password" } } };
+    return { response: { data: { message: "Invalid Email or Password" } } };
   const url = "https://auth.cta.uat.api.codibot.ai/api/v1.5.0/auth/login";
 
   try {

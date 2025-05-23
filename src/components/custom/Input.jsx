@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useState } from "react";
 import { FaEyeSlash, FaEye } from "react-icons/fa";
 
@@ -37,11 +38,10 @@ export default function Input({
         ""
       )}
       <div
-        className={`${
-          type === "password" || icon
-            ? "flex flex-row justify-between items-center relative"
-            : ``
-        }`}
+        className={`${type === "password"
+          ? "flex flex-row justify-between items-center relative"
+          : `relative`
+          }`}
       >
         <input
           className={typeof className === "boolean" ? theme.account : className}
@@ -66,7 +66,7 @@ export default function Input({
               e.stopPropagation();
               onIconPress();
             }}
-            className={`cursor-pointer absolute right-2 ${iconStyles}`}
+            className={`cursor-pointer absolute right-2 top-[50%] translate-y-[-50%] ${iconStyles}`}
           >
             {icon}
           </span>

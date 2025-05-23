@@ -30,6 +30,7 @@ import Chat from "./tabs/chat/chat";
 
 export default function Slides({ currUser }) {
   const location = useLocation();
+
   if (!location.state?.id || !location.state?.name) return <Navigate to="/" />;
 
   const slides = useSelector((state) => state.slides.slides);
@@ -52,6 +53,10 @@ export default function Slides({ currUser }) {
 
   const currentTime = Date.now();
   const viewFullScreen = useRef(null);
+  const tabRef = useRef(null);
+  const timerRef = useRef(null);
+  const posX = useRef(null);
+  const posY = useRef(null);
 
   useEffect(() => {
     try {
@@ -116,158 +121,56 @@ export default function Slides({ currUser }) {
     return response.data.data;
   };
 
-  // useEffect(() => {
-  //   let timeoutId = null;
-  //   let lastX = null;
-  //   let lastY = null;
-  //   let currentTime = null;
-  //   let hasRequestSent = false;
-  //   let wasIdle = false;
-
-  //   const setIdleTimer = () => {
-  //     clearTimeout(timeoutId);
-  //     timeoutId = setTimeout(() => {
-  //       setScreenSaver(true);
-  //       wasIdle = true;
-
-  //       if (!hasRequestSent) {
-  //         hasRequestSent = true;
-  //         SendEventAPI(
-  //           currentTime,
-  //           currUser,
-  //           location.state.id,
-  //           location.state.name,
-  //           meta
-  //         );
-  //       }
-  //     }, 12000);
-  //   };
-
-  //   const handleMouseMove = (e) => {
-  //     const { clientX, clientY } = e;
-
-  //     if (clientX !== lastX || clientY !== lastY) {
-  //       lastX = clientX;
-  //       lastY = clientY;
-
-  //       if (wasIdle) {
-  //         setScreenSaver(false);
-  //         currentTime = Date.now();
-  //         wasIdle = false;
-  //         hasRequestSent = false;
-  //       }
-
-  //       setIdleTimer();
-  //     }
-  //   };
-
-  //   const handleBlur = () => {
-  //     setScreenSaver(true);
-  //     currentTime = Date.now();
-  //     wasIdle = true;
-
-  //     if (!hasRequestSent) {
-  //       hasRequestSent = true;
-  //       SendEventAPI(
-  //         currentTime,
-  //         currUser,
-  //         location.state.id,
-  //         location.state.name,
-  //         meta
-  //       );
-  //     }
-  //   };
-
-  //   const handleFocus = () => {
-  //     if (wasIdle) {
-  //       setScreenSaver(false);
-  //       wasIdle = false;
-  //       hasRequestSent = false;
-  //     }
-  //   };
-
-  //   window.addEventListener("mousemove", handleMouseMove);
-  //   window.addEventListener("blur", handleBlur);
-  //   window.addEventListener("focus", handleFocus);
-
-  //   setIdleTimer();
-
-  //   return () => {
-  //     clearTimeout(timeoutId);
-  //     window.removeEventListener("mousemove", handleMouseMove);
-  //     window.removeEventListener("blur", handleBlur);
-  //     window.removeEventListener("focus", handleFocus);
-  //   };
-  // }, [showQuiz]); // re-run effect if showQuiz state changes
-
-  const startTimeRef = useRef(null);
-  const hasTriggeredRef = useRef(false);
-
   useEffect(() => {
-    let hasFocus = true;
-    let lastX = null;
-    let lastY = null;
-    let timer = null;
-
-    function handleFocus() {
-      hasFocus = true;
-    }
-
-    function handleBlur() {
-      hasFocus = false;
-      startTimeRef.current = Date.now();
-      hasTriggeredRef.current = false;
-
-      timer = setTimeout(() => {
-        if (!hasFocus) {
-          setScreenSaver(true);
-        }
-      }, 120000);
-    }
+    const startTimer = () => {
+      timerRef.current = setTimeout(() => {
+        setScreenSaver(() => true);
+        const timeNow = Date.now();
+        SendEventAPI(
+          timeNow,
+          currUser,
+          location.state?.id,
+          location.state?.name,
+          meta
+        ).catch((err) => console.log(err));
+      }, 12000);
+    };
 
     function handleMouse(e) {
       const { clientX, clientY } = e;
-
-      if (clientX === lastX && clientY === lastY) return;
-      lastX = clientX;
-      lastY = clientY;
-
-      clearTimeout(timer);
-
-      timer = setTimeout(() => {
-        setScreenSaver(true);
-        hasFocus = false;
-        startTimeRef.current = Date.now();
-        hasTriggeredRef.current = false;
-      }, 120000);
-
-      if (screenSaver) {
-        setScreenSaver(false);
-
-        if (!hasTriggeredRef.current && startTimeRef.current) {
-          SendEventAPI(
-            startTimeRef.current,
-            currUser,
-            location.state.id,
-            location.state.name,
-            meta
-          );
-          hasTriggeredRef.current = true;
-        }
-      }
+      if (posX.current === clientX && posY.current === clientY) return;
+      posX.current = clientX;
+      posY.current = clientY;
+      setScreenSaver(() => false);
+      clearTimeout(timerRef.current);
+      startTimer();
     }
 
-    window.addEventListener("focus", handleFocus);
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("mousemove", handleMouse);
+    startTimer();
 
+    window.addEventListener("mousemove", handleMouse);
     return () => {
-      window.removeEventListener("focus", handleFocus);
-      window.removeEventListener("blur", handleBlur);
       window.removeEventListener("mousemove", handleMouse);
-      clearTimeout(timer);
     };
-  }, [screenSaver]);
+  }, []);
+
+  function handleTab(label) {
+    if (label === activeTab) {
+      return setActiveTab("");
+    }
+    setActiveTab(label);
+  }
+
+  useEffect(() => {
+    if (tabRef.current) {
+      if (!activeTab) return;
+      tabRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
+    }
+  }, [activeTab]);
 
   return slides.length === 0 ? (
     <article className="col-span-full">
@@ -406,7 +309,6 @@ export default function Slides({ currUser }) {
 
         <section className="mt-20 mb-20">
           <article className="grid md:grid-cols-2 xl:grid-cols-4 gap-4 items-center">
-            {/* Tabs */}
             {[
               { label: "Notes", Icon: RiBatterySaverFill },
               { label: "Resources", Icon: GrResources },
@@ -415,7 +317,7 @@ export default function Slides({ currUser }) {
             ].map(({ label, Icon }) => (
               <h2
                 key={label}
-                onClick={() => setActiveTab(label)}
+                onClick={() => handleTab(label)}
                 className={`flex justify-center items-center hover:border-b-4 hover:border-b-emerald-600 cursor-pointer ${
                   activeTab === label ? "border-b-4 border-b-emerald-600" : ""
                 } transition-all ease-in-out pb-5 text-xl`}
@@ -433,32 +335,34 @@ export default function Slides({ currUser }) {
             ))}
           </article>
 
-          {activeTab && (
-            <>
-              {activeTab === "Notes" && (
-                <Notes notes={slides[currentSlide - 1].notes} />
-              )}
-              {activeTab === "Resources" && (
-                <ResourceTab resources={slides[currentSlide - 1].resources} />
-              )}
-              {activeTab === "Codi Tutor" && (
-                <CodiTutor
-                  courseId={location.state.id}
-                  currId={currUser.id}
-                  webEnable={webSearch}
-                  ragEnable={docSearch}
-                />
-              )}
-              {activeTab === "Chat with AI" && (
-                <Chat
-                  currUser={currUser}
-                  courseId={location.state.id}
-                  webEnable={webSearch}
-                  ragEnable={docSearch}
-                />
-              )}
-            </>
-          )}
+          <section ref={tabRef}>
+            {activeTab && (
+              <>
+                {activeTab === "Notes" && (
+                  <Notes notes={slides[currentSlide - 1].notes} />
+                )}
+                {activeTab === "Resources" && (
+                  <ResourceTab resources={slides[currentSlide - 1].resources} />
+                )}
+                {activeTab === "Codi Tutor" && (
+                  <CodiTutor
+                    courseId={location.state.id}
+                    currId={currUser.id}
+                    webEnable={webSearch}
+                    ragEnable={docSearch}
+                  />
+                )}
+                {activeTab === "Chat with AI" && (
+                  <Chat
+                    currUser={currUser}
+                    courseId={location.state.id}
+                    webEnable={webSearch}
+                    ragEnable={docSearch}
+                  />
+                )}
+              </>
+            )}
+          </section>
         </section>
       </section>
     </>

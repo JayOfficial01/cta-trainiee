@@ -5,14 +5,11 @@ import axios from "axios";
 export async function handleLogin(bio) {
   const { email, password, check } = bio;
   if (!email || !password)
-    return { failure: true, message: "Email/Password Required " };
+    return { response: { data: { message: "Enter Email or Password" } } };
   if (!email.includes("@") || !email.includes(".com"))
-    return { failure: true, message: "Invalid Email" };
+    return { response: { data: { message: "Invalid Email" } } };
   if (!/^[0-9A-Za-z]*$/.test(password))
-    return {
-      failure: true,
-      message: "Password should only contain characters and numbers",
-    };
+    return { response: { data: { message: "Invalid Password" } } };
   const url = "https://auth.cta.uat.api.codibot.ai/api/v1.5.0/auth/login";
 
   try {

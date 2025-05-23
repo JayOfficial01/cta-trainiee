@@ -42,12 +42,12 @@ function App() {
         {/* Public Route in case the user hasn't logged in */}
         <Route path="/login" element={<Account />} />
         <Route path="/forgot-password" element={<Account />} />
+        <Route path="/otp" element={<Account />} />
         <Route path="*" element={<ErrorPage />} />
 
         {/* Private Routes only access when user logged in */}
         <Route element={<Logged />}>
           <Route path="/openingform" element={<OpeningForm />} />
-          <Route path="/otp" element={<Account />} />
           <Route element={<UserMetaAPI />}>
             <Route
               element={

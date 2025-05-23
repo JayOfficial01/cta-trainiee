@@ -46,7 +46,7 @@ export default function Header({ currUser }) {
   }
 
   return (
-    <header className="border-b border-gray-300 shadow-md bg-gradient-to-r from-gray-50 to-gray-100 ">
+    <header className="border-b border-gray-300 shadow-md bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10">
       <article className="custom-container mx-auto flex justify-between items-center  py-1">
         <Link to="/">
           <img

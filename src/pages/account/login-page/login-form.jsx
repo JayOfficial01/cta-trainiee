@@ -65,7 +65,11 @@ export default function LoginForm() {
                 navigate("/otp");
                 dispatch(setSign());
               } else {
-                toast(signed.response.data.message);
+                if (signed?.response?.data?.detail) {
+                  return toast(signed?.response?.data?.detail[0]?.ctx?.reason);
+                }
+                toast(signed?.response?.data?.message);
+                console.log(signed);
               }
             })
           }

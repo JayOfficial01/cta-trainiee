@@ -41,7 +41,7 @@ export default function OtpInput() {
         }}
         maxLength={1}
         className="w-10  py-3 text-center rounded-sm appearance-none text-sm sm:text-base border border-white  text-gray-700 bg-[#FDFDFD] leading-tight focus:outline-none 
-    focus:ring-2 focus:ring-[#F2C146] transition duration-300 ease-in-out"
+    focus:ring-2 focus:ring-[#F2C146] transition duration-300 ease-in-out mt-5 mb-5"
       />
     );
   });

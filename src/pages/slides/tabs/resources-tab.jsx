@@ -98,7 +98,7 @@ export default function ResourceTab({ resources }) {
           )}
         </div>
       </Modal>
-      <article className="p-2 h-[300px] overflow-y-auto">
+      <article className="p-2">
         {!resources ? (
           <p className="text-center text-zinc-500 text-lg p-3">
             No Resource available
